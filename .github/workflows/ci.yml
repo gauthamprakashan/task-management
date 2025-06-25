@@ -33,6 +33,7 @@ jobs:
             echo "changed=false" >> $GITHUB_OUTPUT
           else
             echo "changed=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Terminate if unwanted changes detected
         if: steps.check.outputs.changed == 'true'
