@@ -26,12 +26,40 @@ Requirements:
 */
 
 const taskSchema = new mongoose.Schema({
-  // TODO: Implement schema fields here
+  title: {
+    type: String,
+    required: true,
+    trim: true,
+  }
+  description: {
+    type: String,
+    trim: true,
+  }
+  status: {
+    type: String,
+    enum: Object.values(TaskStatus),
+    default: TaskStatus.PENDING,
+    required: true,
+  }
+  priority: {
+    type: String,
+    enum: Object.values(TaskPriority),
+    default: TaskPriority.MEDIUM,
+    required: true,
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    index: true,
+  },
+  dueDate: {
+    type: Date,
+  },
 }, {
-  // TODO: Add schema options (timestamps, etc.)
+  timestamps: true,
 });
 
-// TODO: Add indexes for better query performance
-// Consider: userId + status, userId + priority, dueDate
+taskSchema.index({ userId: 1, status: 1 });
 
 export const Task = mongoose.model('Task', taskSchema);
