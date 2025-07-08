@@ -3,33 +3,38 @@ import Joi from 'joi';
 import { TaskStatus, TaskPriority } from '../models/Task.js';
 
 export const userRegistrationSchema = Joi.object({
-  /*TODO: Add required name with length constraints 
-          Add required valid email
-          Add required password with minimum length */
+  name: Joi.string().min(2).max(50).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required(),
 });
 
 export const userLoginSchema = Joi.object({
-/*TODO: Add required email
-        Add required password */
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required(),
 });
 
 export const taskCreationSchema = Joi.object({
-  /* TODO: Add required title 
-           Add optional description 
-           Add optional status, valid against TaskStatus 
-           Add optional priority, valid against TaskPriority 
-           Add optional dueDate (date) */
+  title: Joi.string().min(1).max(100).required(),
+  description: Joi.string().max(500),
+  status: Joi.string().valid(...Object.values(TaskStatus)),
+  priority: Joi.string().valid(...Object.values(TaskPriority)),
+  dueDate: Joi.date(),
 });
 
 export const taskUpdateSchema = Joi.object({
-  /** TODO: Same fields as creation but all optional */
+  title: Joi.string().min(1).max(100),
+  description: Joi.string().max(500),
+  status: Joi.string().valid(...Object.values(TaskStatus)),
+  priority: Joi.string().valid(...Object.values(TaskPriority)),
+  dueDate: Joi.date(),
 });
 
 export const taskQuerySchema = Joi.object({
-  /** TODO: Optional status, valid against TaskStatus 
-            Optional priority, valid against TaskPriority 
-            Optional page, integer >= 1 
-            Optional limit, integer with max limit 
-            Optional sortBy with allowed fields 
-            Optional sortOrder: 'asc' or 'desc' */
+  status: Joi.string().valid(...Object.values(TaskStatus)),
+  priority: Joi.string().valid(...Object.values(TaskPriority)),
+  page: Joi.number().integer().min(1).default(1),
+  limit: Joi.number().integer().min(1).max(100).default(10),
+  sortBy: Joi.string().valid('createdAt', 'dueDate', 'priority', 'status').default('createdAt'),
+  sortOrder: Joi.string().valid('asc', 'desc').default('desc'),
+  search: Joi.string().allow(''),
 });
