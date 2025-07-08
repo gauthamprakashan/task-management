@@ -5,20 +5,30 @@ export const authenticate = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
-    // TODO: If no token, respond with { error: "Access denied. No token provided." } and appropriate status code
+    if (!token) {
+      return res.status(401).json({ error: "Access denied. No token provided." });
+    }
 
     const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      return res.status(500).json({ error: "JWT secret not configured" });
+    }
 
-    // TODO: If JWT secret not set, respond with { error: "JWT secret not configured" } and appropriate status code
+    let decoded;
+    try {
+      decoded = jwt.verify(token, jwtSecret);
+    } catch (err) {
+      return res.status(401).json({ error: "Invalid token." });
+    }
 
-    const decoded = jwt.verify(token, jwtSecret);
     const user = await User.findById(decoded.userId);
-
-    // TODO: If no user found for decoded userId, respond with { error: "Invalid token." } and appropriate status code
+    if (!user) {
+      return res.status(401).json({ error: "Invalid token." });
+    }
 
     req.user = user;
     next();
   } catch (error) {
-    // TODO: On any JWT verification error, respond with { error: "Invalid token." } and appropriate status code
+    return res.status(401).json({ error: "Invalid token." });
   }
 };
